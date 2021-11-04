@@ -20,6 +20,9 @@
 -->
 # Release Notes
 
+### 6.0.2-OS3 (Nov 4, 2021)
+- New plugin release to include metadata tag for MABS 7.2.0 and 8.0 compatibility
+
 ### 6.0.2 (Jun 27, 2019)
 
 -   fix: manually fix line endings of some files that were using CRLF ([`e8e06c3`](https://github.com/apache/cordova-plugin-file/commit/e8e06c3))
