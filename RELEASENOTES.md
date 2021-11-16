@@ -20,6 +20,9 @@
 -->
 # Release Notes
 
+### Unreleased
+- Fix: Added requestLegacyExternalStorage for Android 10 (https://outsystemsrd.atlassian.net/browse/RMET-1195)
+
 ### 6.0.2-OS3 (Nov 4, 2021)
 - New plugin release to include metadata tag for MABS 7.2.0 and 8.0 compatibility
 
