@@ -12,8 +12,6 @@ module.exports = function (context) {
     var dataTags = etreeManifest.findall('./application');
     dataTags[0].set("android:requestLegacyExternalStorage", "true");
 
-    console.log("correu hook")
-
     var resultXmlManifest = etreeManifest.write();
     fs.writeFileSync(manifestPath, resultXmlManifest);
 
