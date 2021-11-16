@@ -20,7 +20,7 @@
 -->
 # Release Notes
 
-### Unreleased
+### 6.0.2-OS4 (Nov 16, 2021)
 - Fix: Added requestLegacyExternalStorage for Android 10 (https://outsystemsrd.atlassian.net/browse/RMET-1195)
 
 ### 6.0.2-OS3 (Nov 4, 2021)
