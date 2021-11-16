@@ -125,6 +125,10 @@ If this is an update to an existing application that did not specify an "Android
 
 to config.xml in order for the application to find previously stored files.
         </info>
+
+        <hook type="before_plugin_install" src="src/android/hooks/installDependencies.js" />
+        <hook type="after_prepare" src="src/android/hooks/androidSetRequestLegacyStorage.js" />
+
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="File" >
                 <param name="android-package" value="org.apache.cordova.file.FileUtils"/>
