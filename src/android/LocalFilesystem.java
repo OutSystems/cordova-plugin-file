@@ -382,26 +382,35 @@ public class LocalFilesystem extends Filesystem {
             append = true;
         }
 
-        byte[] rawData;
-        if (isBinary) {
-            rawData = Base64.decode(data, Base64.DEFAULT);
-        } else {
-            rawData = data.getBytes(Charset.defaultCharset());
-        }
-        ByteArrayInputStream in = new ByteArrayInputStream(rawData);
+        int totalSize = 0;
         try
         {
-        	byte buff[] = new byte[rawData.length];
             String absolutePath = filesystemPathForURL(inputURL);
-            FileOutputStream out = new FileOutputStream(absolutePath, append);
-            try {
-            	in.read(buff, 0, buff.length);
-            	out.write(buff, 0, rawData.length);
-            	out.flush();
-            } finally {
-            	// Always close the output
-            	out.close();
+            //We are writting the file in 300KB blocks so we dont run out of memory.
+            try (FileOutputStream fileOut = new FileOutputStream(absolutePath, append)) {
+                byte[] byteBuffer;
+                int blockSize = 300 * 1024;
+                String block = "";
+                int blockOffset = 0;
+                while (blockOffset < data.length()) {
+
+                    block = data.substring(blockOffset, min(blockOffset + blockSize, data.length()));
+
+                    if (isBinary) {
+                        byteBuffer = Base64.decode(block, Base64.DEFAULT);
+                    } else {
+                        byteBuffer = block.getBytes(Charset.defaultCharset());
+                    }
+
+                    fileOut.write(byteBuffer);
+                    fileOut.flush();
+
+                    totalSize += byteBuffer.length;
+                    blockOffset += blockSize;
+                }
             }
+
+            // Always close the output
             if (isPublicDirectory(absolutePath)) {
                 broadcastNewFile(Uri.fromFile(new File(absolutePath)));
             }
@@ -414,7 +423,7 @@ public class LocalFilesystem extends Filesystem {
             throw realException;
         }
 
-        return rawData.length;
+        return totalSize;
 	}
 
     private boolean isPublicDirectory(String absolutePath) {
