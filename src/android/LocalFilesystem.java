@@ -18,6 +18,7 @@
  */
 package org.apache.cordova.file;
 
+import static java.lang.Math.min;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
