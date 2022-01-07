@@ -410,8 +410,7 @@ public class LocalFilesystem extends Filesystem {
                     blockOffset += blockSize;
                 }
             }
-
-            // Always close the output
+            
             if (isPublicDirectory(absolutePath)) {
                 broadcastNewFile(Uri.fromFile(new File(absolutePath)));
             }
