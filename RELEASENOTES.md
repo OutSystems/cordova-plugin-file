@@ -20,6 +20,9 @@
 -->
 # Release Notes
 
+### 6.0.2-OS5 (Jan 10, 2022)
+- Fix: Write file to disk as blocks to avoid big memory allocation on Android (https://outsystemsrd.atlassian.net/browse/RMET-1283)
+
 ### 6.0.2-OS4 (Nov 16, 2021)
 - Fix: Added requestLegacyExternalStorage for Android 10 (https://outsystemsrd.atlassian.net/browse/RMET-1195)
 
