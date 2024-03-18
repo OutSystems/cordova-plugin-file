@@ -20,6 +20,15 @@
 -->
 # Release Notes
 
+### 6.0.2-OS5 (Jan 10, 2022)
+- Fix: Write file to disk as blocks to avoid big memory allocation on Android (https://outsystemsrd.atlassian.net/browse/RMET-1283)
+
+### 6.0.2-OS4 (Nov 16, 2021)
+- Fix: Added requestLegacyExternalStorage for Android 10 (https://outsystemsrd.atlassian.net/browse/RMET-1195)
+
+### 6.0.2-OS3 (Nov 4, 2021)
+- New plugin release to include metadata tag for MABS 7.2.0 and 8.0 compatibility
+
 ### 6.0.2 (Jun 27, 2019)
 
 -   fix: manually fix line endings of some files that were using CRLF ([`e8e06c3`](https://github.com/apache/cordova-plugin-file/commit/e8e06c3))

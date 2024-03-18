@@ -21,7 +21,7 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
 xmlns:android="http://schemas.android.com/apk/res/android"
            id="cordova-plugin-file"
-      version="6.0.3-dev">
+      version="6.0.2-OS5">
     <name>File</name>
     <description>Cordova File Plugin</description>
     <license>Apache 2.0</license>
@@ -94,7 +94,7 @@ xmlns:android="http://schemas.android.com/apk/res/android"
 
     <!--
     <js-module src="www/ProgressEvent.js" name="ProgressEvent">
-        <clobbers target="window.ProgressEvent" />
+       <clobbers target="window.ProgressEvent" /> 
     </js-module>
     -->
 
@@ -127,6 +127,10 @@ If this is an update to an existing application that did not specify an "Android
 
 to config.xml in order for the application to find previously stored files.
         </info>
+
+        <hook type="before_plugin_install" src="src/android/hooks/installDependencies.js" />
+        <hook type="after_prepare" src="src/android/hooks/androidSetRequestLegacyStorage.js" />
+
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="File" >
                 <param name="android-package" value="org.apache.cordova.file.FileUtils"/>
@@ -134,9 +138,6 @@ to config.xml in order for the application to find previously stored files.
             </feature>
             <allow-navigation href="cdvfile:*" />
         </config-file>
-        <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
-            <application android:requestLegacyExternalStorage="true" />
-        </edit-config>
         <config-file target="AndroidManifest.xml" parent="/*">
             <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
         </config-file>
