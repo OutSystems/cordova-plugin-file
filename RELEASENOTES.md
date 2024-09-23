@@ -20,6 +20,10 @@
 -->
 # Release Notes
 
+### 6.0.2-OS6 (Sept 23, 2024)
+- Fix: Re-write FileReader as CordovaFileReader, avoiding the FileReader API wrapping (https://outsystemsrd.atlassian.net/browse/RMET-3681
+)
+
 ### 6.0.2-OS5 (Jan 10, 2022)
 - Fix: Write file to disk as blocks to avoid big memory allocation on Android (https://outsystemsrd.atlassian.net/browse/RMET-1283)
 
