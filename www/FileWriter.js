@@ -21,7 +21,7 @@
 
 var exec = require('cordova/exec');
 var FileError = require('./FileError');
-var FileReader = require('./FileReader');
+var CordovaFileReader = require('./CordovaFileReader');
 var ProgressEvent = require('./ProgressEvent');
 
 /**
@@ -107,7 +107,7 @@ FileWriter.prototype.write = function (data, isPendingBlobReadResult) {
 
     // Check to see if the incoming data is a blob
     if (data instanceof File || (!isProxySupportBlobNatively && supportsBinary && data instanceof Blob)) {
-        var fileReader = new FileReader();
+        var fileReader = new CordovaFileReader();
         /* eslint-enable no-undef */
         fileReader.onload = function () {
             // Call this method again, with the arraybuffer as argument

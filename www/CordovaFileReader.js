@@ -10,7 +10,7 @@
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing,
+marta * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  * KIND, either express or implied.  See the License for the
@@ -34,7 +34,7 @@ var origFileReader = modulemapper.getOriginalSymbol(window, 'FileReader');
  *      To read from the SD card, the file name is "sdcard/my_file.txt"
  * @constructor
  */
-var FileReader = function () {
+var CordovaFileReader = function () {
     this._readyState = 0;
     this._error = null;
     this._result = null;
@@ -49,27 +49,27 @@ var FileReader = function () {
  * (Note attempts to allocate more than a few MB of contiguous memory on the native side are likely to cause
  * OOM exceptions, while the JS engine seems to have fewer problems managing large strings or ArrayBuffers.)
  */
-FileReader.READ_CHUNK_SIZE = 256 * 1024;
+CordovaFileReader.READ_CHUNK_SIZE = 256 * 1024;
 
 // States
-FileReader.EMPTY = 0;
-FileReader.LOADING = 1;
-FileReader.DONE = 2;
+CordovaFileReader.EMPTY = 0;
+CordovaFileReader.LOADING = 1;
+CordovaFileReader.DONE = 2;
 
-utils.defineGetter(FileReader.prototype, 'readyState', function () {
+utils.defineGetter(CordovaFileReader.prototype, 'readyState', function () {
     return this._localURL ? this._readyState : this._realReader.readyState;
 });
 
-utils.defineGetter(FileReader.prototype, 'error', function () {
+utils.defineGetter(CordovaFileReader.prototype, 'error', function () {
     return this._localURL ? this._error : this._realReader.error;
 });
 
-utils.defineGetter(FileReader.prototype, 'result', function () {
+utils.defineGetter(CordovaFileReader.prototype, 'result', function () {
     return this._localURL ? this._result : this._realReader.result;
 });
 
 function defineEvent (eventName) {
-    utils.defineGetterSetter(FileReader.prototype, eventName, function () {
+    utils.defineGetterSetter(CordovaFileReader.prototype, eventName, function () {
         return this._realReader[eventName] || null;
     }, function (value) {
         this._realReader[eventName] = value;
@@ -84,14 +84,14 @@ defineEvent('onabort');        // When the read has been aborted. For instance, 
 
 function initRead (reader, file) {
     // Already loading something
-    if (reader.readyState === FileReader.LOADING) {
+    if (reader.readyState === CordovaFileReader.LOADING) {
         throw new FileError(FileError.INVALID_STATE_ERR);
     }
 
     reader._result = null;
     reader._error = null;
     reader._progress = 0;
-    reader._readyState = FileReader.LOADING;
+    reader._readyState = CordovaFileReader.LOADING;
 
     if (typeof file.localURL === 'string') {
         reader._localURL = file.localURL;
@@ -117,18 +117,18 @@ function initRead (reader, file) {
  * @param r Callback result returned by the last read exec() call, or null to begin reading.
  */
 function readSuccessCallback (readType, encoding, offset, totalSize, accumulate, r) {
-    if (this._readyState === FileReader.DONE) {
+    if (this._readyState === CordovaFileReader.DONE) {
         return;
     }
 
-    var CHUNK_SIZE = FileReader.READ_CHUNK_SIZE;
+    var CHUNK_SIZE = CordovaFileReader.READ_CHUNK_SIZE;
     if (readType === 'readAsDataURL') {
         // Windows proxy does not support reading file slices as Data URLs
         // so read the whole file at once.
         CHUNK_SIZE = cordova.platformId === 'windows' ? totalSize : // eslint-disable-line no-undef
             // Calculate new chunk size for data URLs to be multiply of 3
             // Otherwise concatenated base64 chunks won't be valid base64 data
-            FileReader.READ_CHUNK_SIZE - (FileReader.READ_CHUNK_SIZE % 3) + 3;
+            CordovaFileReader.READ_CHUNK_SIZE - (CordovaFileReader.READ_CHUNK_SIZE % 3) + 3;
     }
 
     if (typeof r !== 'undefined') {
@@ -153,7 +153,7 @@ function readSuccessCallback (readType, encoding, offset, totalSize, accumulate,
             readFailureCallback.bind(this),
             'File', readType, execArgs);
     } else {
-        this._readyState = FileReader.DONE;
+        this._readyState = CordovaFileReader.DONE;
 
         if (typeof this.onload === 'function') {
             this.onload(new ProgressEvent('load', {target: this}));
@@ -170,11 +170,11 @@ function readSuccessCallback (readType, encoding, offset, totalSize, accumulate,
  * Must be bound to the FileReader's this, e.g. readFailureCallback.bind(this)
  */
 function readFailureCallback (e) {
-    if (this._readyState === FileReader.DONE) {
+    if (this._readyState === CordovaFileReader.DONE) {
         return;
     }
 
-    this._readyState = FileReader.DONE;
+    this._readyState = CordovaFileReader.DONE;
     this._result = null;
     this._error = new FileError(e);
 
@@ -190,17 +190,17 @@ function readFailureCallback (e) {
 /**
  * Abort reading file.
  */
-FileReader.prototype.abort = function () {
+CordovaFileReader.prototype.abort = function () {
     if (origFileReader && !this._localURL) {
         return this._realReader.abort();
     }
     this._result = null;
 
-    if (this._readyState === FileReader.DONE || this._readyState === FileReader.EMPTY) {
+    if (this._readyState === CordovaFileReader.DONE || this._readyState === CordovaFileReader.EMPTY) {
         return;
     }
 
-    this._readyState = FileReader.DONE;
+    this._readyState = CordovaFileReader.DONE;
 
     // If abort callback
     if (typeof this.onabort === 'function') {
@@ -218,7 +218,7 @@ FileReader.prototype.abort = function () {
  * @param file          {File} File object containing file properties
  * @param encoding      [Optional] (see http://www.iana.org/assignments/character-sets)
  */
-FileReader.prototype.readAsText = function (file, encoding) {
+CordovaFileReader.prototype.readAsText = function (file, encoding) {
     if (initRead(this, file)) {
         return this._realReader.readAsText(file, encoding);
     }
@@ -242,7 +242,7 @@ FileReader.prototype.readAsText = function (file, encoding) {
  *
  * @param file          {File} File object containing file properties
  */
-FileReader.prototype.readAsDataURL = function (file) {
+CordovaFileReader.prototype.readAsDataURL = function (file) {
     if (initRead(this, file)) {
         return this._realReader.readAsDataURL(file);
     }
@@ -263,7 +263,7 @@ FileReader.prototype.readAsDataURL = function (file) {
  *
  * @param file          {File} File object containing file properties
  */
-FileReader.prototype.readAsBinaryString = function (file) {
+CordovaFileReader.prototype.readAsBinaryString = function (file) {
     if (initRead(this, file)) {
         return this._realReader.readAsBinaryString(file);
     }
@@ -282,7 +282,7 @@ FileReader.prototype.readAsBinaryString = function (file) {
  *
  * @param file          {File} File object containing file properties
  */
-FileReader.prototype.readAsArrayBuffer = function (file) {
+CordovaFileReader.prototype.readAsArrayBuffer = function (file) {
     if (initRead(this, file)) {
         return this._realReader.readAsArrayBuffer(file);
     }
@@ -295,4 +295,4 @@ FileReader.prototype.readAsArrayBuffer = function (file) {
     }.bind(this));
 };
 
-module.exports = FileReader;
+module.exports = CordovaFileReader;
