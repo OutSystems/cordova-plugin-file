@@ -22,6 +22,7 @@
 #import "CDVLocalFilesystem.h"
 #import "CDVAssetLibraryFilesystem.h"
 #import <objc/message.h>
+#import <Photos/Photos.h>
 
 static NSString* toBase64(NSData* data) {
     SEL s1 = NSSelectorFromString(@"cdv_base64EncodedString");
@@ -1113,6 +1114,82 @@ NSString* const kCDVFilesystemURLPrefix = @"cdvfile";
     } else {
         result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Cannot resolve URL to a file"];
     }
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
+- (void)streamFileToWebView:(CDVInvokedUrlCommand*)command
+{
+    NSString* fileUri = [command argumentAtIndex:0];
+    
+    [self.commandDelegate runInBackground:^{
+        NSURL* fileURL = [NSURL URLWithString:fileUri];
+        
+        // Check if the file is in the Photos library
+        if ([fileURL.scheme isEqualToString:@"file"] && [fileURL.path containsString:@"/var/mobile/Media/DCIM/"]) {
+            [self handlePhotosLibraryFile:fileURL command:command];
+        } else {
+            [self handleRegularFile:fileURL command:command];
+        }
+    }];
+}
+
+- (void)handlePhotosLibraryFile:(NSURL*)fileURL command:(CDVInvokedUrlCommand*)command
+{
+    PHFetchResult* assets = [PHAsset fetchAssetsWithALAssetURLs:@[fileURL] options:nil];
+    if (assets.count == 0) {
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"File not found in Photos library"];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        return;
+    }
+    
+    PHAsset* asset = assets.firstObject;
+    PHImageRequestOptions* options = [[PHImageRequestOptions alloc] init];
+    options.synchronous = YES;
+    options.networkAccessAllowed = YES;
+    options.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
+    
+    [[PHImageManager defaultManager] requestImageDataForAsset:asset options:options resultHandler:^(NSData * _Nullable imageData, NSString * _Nullable dataUTI, UIImageOrientation orientation, NSDictionary * _Nullable info) {
+        if (imageData) {
+            NSString* mimeType = (__bridge_transfer NSString*)UTTypeCopyPreferredTagWithClass((__bridge CFStringRef)dataUTI, kUTTagClassMIMEType);
+            [self sendDataToWebView:imageData mimeType:mimeType command:command];
+        } else {
+            CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Failed to read image data"];
+            [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        }
+    }];
+}
+
+- (void)handleRegularFile:(NSURL*)fileURL command:(CDVInvokedUrlCommand*)command
+{
+    NSError* error;
+    NSData* fileData = [NSData dataWithContentsOfURL:fileURL options:NSDataReadingMappedIfSafe error:&error];
+    
+    if (error) {
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:[error localizedDescription]];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        return;
+    }
+    
+    if (fileData) {
+        NSString* mimeType = [self getMimeTypeFromPath:fileURL.path];
+        [self sendDataToWebView:fileData mimeType:mimeType command:command];
+    } else {
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Failed to read file data"];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }
+}
+
+- (void)sendDataToWebView:(NSData*)data mimeType:(NSString*)mimeType command:(CDVInvokedUrlCommand*)command
+{
+    NSString* base64 = [data base64EncodedStringWithOptions:0];
+    NSString* dataUrl = [NSString stringWithFormat:@"data:%@;base64,%@", mimeType, base64];
+    
+    NSDictionary* resultDict = @{
+        @"data": dataUrl,
+        @"mimeType": mimeType
+    };
+    
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:resultDict];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
