@@ -20,6 +20,9 @@
 -->
 # Release Notes
 
+### 6.0.2-OS7 (Oct 8, 2024)
+- Fix: Added streamFileToWebView method to FileUtils for sandboxed URIs (https://outsystemsrd.atlassian.net/browse/RMET-4433)
+
 ### 6.0.2-OS6 (Sept 23, 2024)
 - Fix: Re-write FileReader as CordovaFileReader, avoiding the FileReader API wrapping (https://outsystemsrd.atlassian.net/browse/RMET-3681
 )
