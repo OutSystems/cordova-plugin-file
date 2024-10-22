@@ -20,6 +20,9 @@
 -->
 # Release Notes
 
+### 6.0.2-OS7 (Oct 22, 2024)
+- Fix(android): Allow reading data from URIs retrieved from the photo picker (https://outsystemsrd.atlassian.net/browse/RMET-3632)
+
 ### 6.0.2-OS6 (Sept 23, 2024)
 - Fix: Re-write FileReader as CordovaFileReader, avoiding the FileReader API wrapping (https://outsystemsrd.atlassian.net/browse/RMET-3681
 )
