@@ -36,6 +36,7 @@ public class ContentFilesystem extends Filesystem {
 
     private final Context context;
     private final String PHOTO_PICKER_PREFIX = "/synthetic/picker_get_content/";
+    private final String CONTENT_PICKER_URI_PREFIX = "content://media/picker_get_content/";
 
 	public ContentFilesystem(Context context, CordovaResourceApi resourceApi) {
 		super(Uri.parse("content://"), "content", resourceApi);
@@ -50,7 +51,7 @@ public class ContentFilesystem extends Filesystem {
             String location = path.substring(
                     path.lastIndexOf(PHOTO_PICKER_PREFIX) + PHOTO_PICKER_PREFIX.length(),
                     path.lastIndexOf('.'));
-            return Uri.parse("content://media/picker_get_content/" + location);
+            return Uri.parse(CONTENT_PICKER_URI_PREFIX + location);
         }
 
         String authorityAndPath = inputURL.uri.getEncodedPath().substring(this.name.length() + 2);
@@ -77,7 +78,7 @@ public class ContentFilesystem extends Filesystem {
             String location = path.substring(
                     path.lastIndexOf(PHOTO_PICKER_PREFIX) + PHOTO_PICKER_PREFIX.length(),
                     path.lastIndexOf('.'));
-            inputURL = Uri.parse("content://media/picker_get_content/" + location);
+            inputURL = Uri.parse(CONTENT_PICKER_URI_PREFIX + location);
         }
         if (!"content".equals(inputURL.getScheme())) {
             return null;
