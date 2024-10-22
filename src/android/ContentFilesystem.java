@@ -35,6 +35,8 @@ import org.json.JSONObject;
 public class ContentFilesystem extends Filesystem {
 
     private final Context context;
+    private final String PHOTO_PICKER_PREFIX = "/synthetic/picker_get_content/";
+    private final String CONTENT_PICKER_URI_PREFIX = "content://media/picker_get_content/";
 
 	public ContentFilesystem(Context context, CordovaResourceApi resourceApi) {
 		super(Uri.parse("content://"), "content", resourceApi);
@@ -43,6 +45,15 @@ public class ContentFilesystem extends Filesystem {
 
     @Override
     public Uri toNativeUri(LocalFilesystemURL inputURL) {
+        String path = inputURL.uri.getPath();
+        if (path != null && path.contains(PHOTO_PICKER_PREFIX)) {
+            // This is a Photo Picker URI, convert it to a content:// URI
+            String location = path.substring(
+                    path.lastIndexOf(PHOTO_PICKER_PREFIX) + PHOTO_PICKER_PREFIX.length(),
+                    path.lastIndexOf('.'));
+            return Uri.parse(CONTENT_PICKER_URI_PREFIX + location);
+        }
+
         String authorityAndPath = inputURL.uri.getEncodedPath().substring(this.name.length() + 2);
         if (authorityAndPath.length() < 2) {
             return null;
@@ -61,6 +72,14 @@ public class ContentFilesystem extends Filesystem {
 
     @Override
     public LocalFilesystemURL toLocalUri(Uri inputURL) {
+        String path = inputURL.getPath();
+        if (path != null && path.contains(PHOTO_PICKER_PREFIX)) {
+            // This is a Photo Picker URI, convert it to a content:// URI
+            String location = path.substring(
+                    path.lastIndexOf(PHOTO_PICKER_PREFIX) + PHOTO_PICKER_PREFIX.length(),
+                    path.lastIndexOf('.'));
+            inputURL = Uri.parse(CONTENT_PICKER_URI_PREFIX + location);
+        }
         if (!"content".equals(inputURL.getScheme())) {
             return null;
         }
