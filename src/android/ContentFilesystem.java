@@ -35,18 +35,19 @@ import org.json.JSONObject;
 public class ContentFilesystem extends Filesystem {
 
     private final Context context;
-    private final String SYNTHETIC_URI_PREFIX = "/synthetic/";
+    private static final String SYNTHETIC_URI_PREFIX = "/synthetic/";
+    private static final String CONTENT_SCHEME = "content://";
 
 	public ContentFilesystem(Context context, CordovaResourceApi resourceApi) {
-		super(Uri.parse("content://"), "content", resourceApi);
+		super(Uri.parse(CONTENT_SCHEME), "content", resourceApi);
         this.context = context;
     }
     
-    private Uri convertSyntehticUri(String path) {
+    private Uri convertSyntheticUri(String path) {
         String location = path.substring(
                 path.lastIndexOf(SYNTHETIC_URI_PREFIX) + SYNTHETIC_URI_PREFIX.length(),
                 path.lastIndexOf('.'));
-        String CONTENT_URI_PREFIX = "content://media/";
+        String CONTENT_URI_PREFIX = CONTENT_SCHEME + "media/";
         return Uri.parse(CONTENT_URI_PREFIX + location);
     }
 
@@ -54,14 +55,14 @@ public class ContentFilesystem extends Filesystem {
     public Uri toNativeUri(LocalFilesystemURL inputURL) {
         String path = inputURL.uri.getPath();
         if (path != null && path.contains(SYNTHETIC_URI_PREFIX)) {
-            return convertSyntehticUri(path);
+            return convertSyntheticUri(path);
         }
 
         String authorityAndPath = inputURL.uri.getEncodedPath().substring(this.name.length() + 2);
         if (authorityAndPath.length() < 2) {
             return null;
         }
-        String ret = "content://" + authorityAndPath;
+        String ret = CONTENT_SCHEME + authorityAndPath;
         String query = inputURL.uri.getEncodedQuery();
         if (query != null) {
             ret += '?' + query;
@@ -77,9 +78,9 @@ public class ContentFilesystem extends Filesystem {
     public LocalFilesystemURL toLocalUri(Uri inputURL) {
         String path = inputURL.getPath();
         if (path != null && path.contains(SYNTHETIC_URI_PREFIX)) {
-            inputURL = convertSyntehticUri(path);
+            inputURL = convertSyntheticUri(path);
         }
-        if (!"content".equals(inputURL.getScheme())) {
+        if (!CONTENT_SCHEME.substring(0, CONTENT_SCHEME.length() - 2).equals(inputURL.getScheme())) {
             return null;
         }
         String subPath = inputURL.getEncodedPath();
