@@ -18,6 +18,8 @@
  */
 package org.apache.cordova.file;
 
+import static org.apache.cordova.file.ContentFilesystem.CONTENT_SCHEME;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
@@ -572,7 +574,7 @@ public class FileUtils extends CordovaPlugin {
     }
 
     private boolean needPermission(String nativeURL, int permissionType) throws JSONException {
-        if (nativeURL.startsWith("content://")) {
+        if (nativeURL.startsWith(CONTENT_SCHEME)) {
             return false; // Content URIs don't need explicit permissions
         }
         
