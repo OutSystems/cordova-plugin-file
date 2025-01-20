@@ -36,10 +36,11 @@ public class ContentFilesystem extends Filesystem {
 
     private final Context context;
     private static final String SYNTHETIC_URI_PREFIX = "/synthetic/";
-    static final String CONTENT_SCHEME = "content://";
+    private static final String CONTENT_SCHEME_NAME = "content";
+    static final String CONTENT_SCHEME = CONTENT_SCHEME_NAME + "://";
 
 	public ContentFilesystem(Context context, CordovaResourceApi resourceApi) {
-		super(Uri.parse(CONTENT_SCHEME), "content", resourceApi);
+		super(Uri.parse(CONTENT_SCHEME), CONTENT_SCHEME_NAME, resourceApi);
         this.context = context;
     }
     
@@ -80,7 +81,7 @@ public class ContentFilesystem extends Filesystem {
         if (path != null && path.contains(SYNTHETIC_URI_PREFIX)) {
             inputURL = convertSyntheticUri(path);
         }
-        if (!CONTENT_SCHEME.substring(0, CONTENT_SCHEME.length() - 2).equals(inputURL.getScheme())) {
+        if (!CONTENT_SCHEME_NAME.equals(inputURL.getScheme())) {
             return null;
         }
         String subPath = inputURL.getEncodedPath();
