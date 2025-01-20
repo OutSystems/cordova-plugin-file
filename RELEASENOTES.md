@@ -20,6 +20,9 @@
 -->
 # Release Notes
 
+### 6.0.2-OS8 (Jan 20, 2025)
+- Fix: Android: Opening content:// Uri's (https://outsystemsrd.atlassian.net/browse/RMET-3998)
+
 ### 6.0.2-OS7 (Nov 22, 2024)
 - Fix: Android: Add `READ_EXTERNAL_STORAGE` permission to plugin (https://outsystemsrd.atlassian.net/browse/RMET-3856)
 - Fix: Android: Allow reading data from URIs retrieved from the photo picker (https://outsystemsrd.atlassian.net/browse/RMET-3632)
