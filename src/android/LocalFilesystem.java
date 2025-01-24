@@ -19,7 +19,6 @@
 package org.apache.cordova.file;
 
 import static java.lang.Math.min;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -73,7 +72,7 @@ public class LocalFilesystem extends Filesystem {
 
     @Override
     public LocalFilesystemURL toLocalUri(Uri inputURL) {
-        if (!"file".equals(inputURL.getScheme())) {
+        if (!isValidLocalUri(inputURL)) {
             return null;
         }
         File f = new File(inputURL.getPath());
@@ -101,6 +100,18 @@ public class LocalFilesystem extends Filesystem {
             b.appendEncodedPath("");
         }
         return LocalFilesystemURL.parse(b.build());
+    }
+
+    private boolean isValidLocalUri(Uri inputURL) {
+        String scheme = inputURL.getScheme();
+        if (scheme == null) {
+            String path = inputURL.getPath();
+            // if contains synthetic, then it is meant to be a content url
+            //  otherwise, it can be a valid file path just without the file:// scheme
+            return path != null && !path.contains(ContentFilesystem.SYNTHETIC_URI_PREFIX);
+        } else {
+            return scheme.equals("file");
+        }
     }
 
 	@Override
