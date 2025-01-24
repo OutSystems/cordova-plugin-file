@@ -109,9 +109,8 @@ public class LocalFilesystem extends Filesystem {
             // if contains synthetic, then it is meant to be a content url
             //  otherwise, it can be a valid file path just without the file:// scheme
             return path != null && !path.contains(ContentFilesystem.SYNTHETIC_URI_PREFIX);
-        } else {
-            return scheme.equals("file");
         }
+        return scheme.equals("file");
     }
 
 	@Override

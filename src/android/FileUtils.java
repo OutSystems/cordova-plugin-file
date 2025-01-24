@@ -575,13 +575,12 @@ public class FileUtils extends CordovaPlugin {
     }
 
     private boolean needPermission(String nativeURL, int permissionType) throws JSONException {
-        if (nativeURL.startsWith(CONTENT_SCHEME)) {
-            return false; // Content URIs don't need explicit permissions
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU || nativeURL.startsWith(CONTENT_SCHEME)) {
             // legacy storage permissions not usable on Android 13 and above
             //  and we don't want to request READ_MEDIA_IMAGES nor READ_MEDIA_VIDEO permissions
+            // Also, Content URIs don't need any permission requests
             return false;
-        }
+        } 
         
         JSONObject j = requestAllPaths();
         ArrayList<String> allowedStorageDirectories = new ArrayList<String>();
