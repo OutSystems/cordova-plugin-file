@@ -47,7 +47,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.security.Permission;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -79,6 +78,7 @@ public class FileUtils extends CordovaPlugin {
     public static final int ACTION_GET_FILE = 0;
     public static final int ACTION_WRITE = 1;
     public static final int ACTION_GET_DIRECTORY = 2;
+    public static final int ACTION_READ_ARRAY_BUFFER = 5;
 
     public static final int WRITE = 3;
     public static final int READ = 4;
@@ -338,9 +338,10 @@ public class FileUtils extends CordovaPlugin {
                     String fname=args.getString(0);
                     String nativeURL = resolveLocalFileSystemURI(fname).getString("nativeURL");
                     if(needPermission(nativeURL, READ)) {
-                        getReadPermission(rawArgs, ACTION_GET_FILE, callbackContext);
+                        getReadPermission(rawArgs, ACTION_READ_ARRAY_BUFFER, callbackContext);
+                    } else {
+                        readFileAs(fname, start, end, callbackContext, null, PluginResult.MESSAGE_TYPE_ARRAYBUFFER);
                     }
-                    readFileAs(fname, start, end, callbackContext, null, PluginResult.MESSAGE_TYPE_ARRAYBUFFER);
                 }
             }, rawArgs, callbackContext);
         }
@@ -576,6 +577,10 @@ public class FileUtils extends CordovaPlugin {
     private boolean needPermission(String nativeURL, int permissionType) throws JSONException {
         if (nativeURL.startsWith(CONTENT_SCHEME)) {
             return false; // Content URIs don't need explicit permissions
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // legacy storage permissions not usable on Android 13 and above
+            //  and we don't want to request READ_MEDIA_IMAGES nor READ_MEDIA_VIDEO permissions
+            return false;
         }
         
         JSONObject j = requestAllPaths();
@@ -1224,6 +1229,16 @@ public class FileUtils extends CordovaPlugin {
                             Boolean isBinary=args.getBoolean(3);
                             long fileSize = write(fname, data, offset, isBinary);
                             req.getCallbackContext().sendPluginResult(new PluginResult(PluginResult.Status.OK, fileSize));
+                        }
+                    }, req.getRawArgs(), req.getCallbackContext());
+                    break;
+                case ACTION_READ_ARRAY_BUFFER:
+                    threadhelper( new FileOp( ){
+                        public void run(JSONArray args) throws JSONException, FileNotFoundException, IOException, NoModificationAllowedException {
+                            int start = args.getInt(1);
+                            int end = args.getInt(2);
+                            String fname=args.getString(0);
+                            readFileAs(fname, start, end, req.getCallbackContext(), null, PluginResult.MESSAGE_TYPE_ARRAYBUFFER);
                         }
                     }, req.getRawArgs(), req.getCallbackContext());
                     break;
