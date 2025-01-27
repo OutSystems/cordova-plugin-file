@@ -20,7 +20,7 @@
 -->
 # Release Notes
 
-### Unreleased (Jan 24, 2025)
+### 6.0.2-OS9 (Jan 24, 2025)
 - Fix: Android: Reading from external storage on Android 13 and above (https://outsystemsrd.atlassian.net/browse/RMET-4021)
 - Fix: Android: Getting local file without "file://" in uri (https://outsystemsrd.atlassian.net/browse/RMET-4021)
 
