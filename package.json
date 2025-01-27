@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-file",
-  "version": "6.0.2-OS8",
+  "version": "6.0.2-9",
   "description": "Cordova File Plugin",
   "types": "./types/index.d.ts",
   "cordova": {
