@@ -35,7 +35,7 @@ import org.json.JSONObject;
 public class ContentFilesystem extends Filesystem {
 
     private final Context context;
-    private static final String SYNTHETIC_URI_PREFIX = "/synthetic/";
+    static final String SYNTHETIC_URI_PREFIX = "/synthetic/";
     private static final String CONTENT_SCHEME_NAME = "content";
     static final String CONTENT_SCHEME = CONTENT_SCHEME_NAME + "://";
 
